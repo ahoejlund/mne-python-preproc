@@ -35,7 +35,4 @@ os.chdir(script_path)
 for j in fileList: #numpy.arange(0,numpy.size(fileList)):
     print j
     submit_cmd = "python analysisPipeline_clusterize.py %s %s %s" %(j, rawRoot, resultsRoot, scriptsRoot)
-    subprocess.call([cmd, "1",submit_cmd]) #
-#submit_cmd = "python ecg_eog_sourceplots.py %s %s %s %s" %(j, i, rawRoot, resultsRoot)
-#submit_cmd = "python analysisPipeline_clusterize.py %s %s %s" %(j, rawRoot, resultsRoot)
-#submit_cmd = "python analysisPipeline_isis.py %s" %(j)
+    subprocess.call([cmd, "1",submit_cmd]) # submit to ISIS
