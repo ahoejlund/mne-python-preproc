@@ -10,8 +10,10 @@ Can use visual feedback to reject components
 Copy the raw and ica solutions of files into\
 a new folder. here for eg. artRej
 
+# Run automatic ArtRej routine first
 # Needs: *-raw.fif and *-ica.fif files
 # Takes user input in TUI
+
 
 """
 
