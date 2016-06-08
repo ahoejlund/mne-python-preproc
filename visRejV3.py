@@ -16,11 +16,6 @@ import mne
 import numpy as np
 from mne.preprocessing import create_ecg_epochs, create_eog_epochs
 
-#plt.interactive(True)
-#plt.ioff()
-
-
-
 ## which steps to run
 ## first steps
 read = 1 ## can't save filtered files, so don't run this time \
@@ -34,11 +29,13 @@ ICAraw = 1
 
 
 ## set path and subs
-baseRoot='/projects/MINDLAB2011_39-STN-DBS-Effect-Cortex-MEG/scratch/CMC/control'
-rawRoot     = baseRoot+'/tSSS/'
-artRejRoot  = baseRoot+'/artRej/visRej/'
-resultsRoot = baseRoot+'/artRej/'
-
+baseRoot='/projects/<yourProj>/<folder>' # your projects folder
+rawRoot     = baseRoot+'/tSSS/'          # Folder containing RAW files post-tSSS
+artRejRoot  = baseRoot+'/artRej/visRej/' # Folder containing artRej files from auto-Run
+resultsRoot = baseRoot+'/artRej/'        # Folder to save PDFs, RAW-clean: \
+                                         # Program appends file names with '-vis' tag\
+                                         # No overwrite risk
+# Create results folder
 try:
     os.stat(resultsRoot)
     print '*** Directory already exists'
@@ -50,13 +47,6 @@ except:
 icaFileList = [f for f in os.listdir(artRejRoot) if f.endswith('-ica.fif')]
 icaFileList.sort()
 
-#rawFileList = [f for f in os.listdir(artRejRoot) if f.endswith('tSSS.fif')]
-#rawFileList.sort()
-
-#artRejFileList = [f for f in os.listdir(artRejRoot) if f.endswith('_ica-raw.fif')]
-#artRejFileList.sort()
-
-#rawFileList=[]
 artRejFileList=[]
 
 for f in np.arange(0,np.size(icaFileList)): 
