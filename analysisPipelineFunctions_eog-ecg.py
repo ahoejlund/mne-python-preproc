@@ -5,6 +5,7 @@ Adapted on Aug 2015)
 
 @orig_author: lau
 @author: andreas & niels christian
+@author: kousik
 """
 '''ANALYSIS PIPELINE FUNCTIONS'''
 ' Many of these are NOT used!!! '
@@ -14,19 +15,12 @@ import mne
 import os
 import numpy as np
 import scipy as sci
-#==============================================================================
-# import sklearn
-# import sklearn.svm
-# import sklearn.pipeline
-# import sklearn.feature_selection
-# import sklearn.cross_validation
-# import sklearn.preprocessing
-# import sklearn.linear_model
-#==============================================================================
 import matplotlib
+## Set backends for plotting
 matplotlib.use('TkAgg')
 print('TkAgg')
 import matplotlib.pyplot as plt
+## Import mne specific modules
 from mne.io import Raw
 from mne.preprocessing import ICA
 from mne.preprocessing import create_ecg_epochs, create_eog_epochs
@@ -34,8 +28,6 @@ from mne.viz import plot_evoked_topomap
 
 
 ''' PREPROCESSING PART '''
-    
-       
 def readRawList(fileList,preload=False):
     '''Read in fileList, and choose whether to preload. Returns "raw"'''
     raw = Raw(fileList,preload=preload) ## read in files
@@ -60,26 +52,6 @@ def findEvents(raw,stim_channel='STI101',verbose=False,
      return events                                   
                                                                      
   
-    
-''' re adjustTimeLineBy, cf. spm-preproc-script (meg_context_pipeline_func) '''
-def getEpochs(raw,tmin,tmax,baseline,reject,event_id,picks,verbose=False,
-              decim=4,adjustTimeLineBy=-13.6):
-    epochsList = []
-
-    events = mne.find_events(raw, stim_channel='STI101', shortest_event=1)
-    print events[:,0]
-    ## adjust trigger timeline
-    events[:,0] = [x - np.round(adjustTimeLineBy*10**-3 * raw.info['sfreq']) for x in events[:,0]]
-    print events[:,0]        
-    
-    ## epoching   
-    epochs = mne.Epochs(raw,events,event_id,tmin,tmax,picks=picks,
-                        baseline=baseline,reject=reject,preload=True,
-                        decim=decim,verbose=verbose)
-    epochs.drop_bad_epochs()
-    epochsList.append(epochs)
-    return epochsList
-
 ''' cf. http://martinos.org/mne/stable/auto_examples/preprocessing/plot_ica_from_raw.html for help on integrating ecg-identification as well '''    
 def runICA(raw,saveRoot,name):
 
@@ -106,21 +78,13 @@ def runICA(raw,saveRoot,name):
 
     ecg_source_idx, ecg_scores = ica.find_bads_ecg(ecg_epochs, method='ctps')
     eog_source_idx, eog_scores = ica.find_bads_eog(raw,ch_name=raw.ch_names[eog_picks].encode('ascii', 'ignore'))
-    #eog_source_idx_2, eog_scores_2 = ica.find_bads_eog(raw,ch_name='EOG002')
-    #if not eog_source_idx_2:
-    #    horiz = 0
-    
-    #show_picks = np.abs(scores).argsort()[::-1][:5]
-    #ica.plot_sources(raw, show_picks, exclude=ecg_inds, title=title % 'ecg')
-    
-        
+       
     # defining a title-frame for later use
     title = 'Sources related to %s artifacts (red)'
 
     # extracting number of ica-components and plotting their topographies
     source_idx = range(0, ica.n_components_)
     ica_plot = ica.plot_components(source_idx, ch_type="mag")                                           
-
 
     # select ICA sources and reconstruct MEG signals, compute clean ERFs
     # Add detected artefact sources to exclusion list
@@ -186,18 +150,10 @@ def runICA(raw,saveRoot,name):
             '-ecg' + map(str, ecg_exclude)[0] + '_' + map(str, ecg_exclude)[1] + '_' + map(str, ecg_exclude)[2] + '.pdf', format = 'pdf')
     
     # plot the scores for the different components highlighting in red that/those related to ECG
-    #scores_plots=plt.figure()
-    #ax = plt.subplot(2,1,1)
     scores_plots_ecg=ica.plot_scores(ecg_scores, exclude=ecg_source_idx, title=title % 'ecg')
     scores_plots_ecg.savefig(saveRoot + name + '_ecg_scores.pdf', format = 'pdf')
-    #ax = plt.subplot(2,1,2)
     scores_plots_eog=ica.plot_scores(eog_scores, exclude=eog_source_idx, title=title % 'eog')
     scores_plots_eog.savefig(saveRoot + name + '_eog_scores.pdf', format = 'pdf')
-    
-    #if len(ecg_exclude) > 0:    
-    # estimate average artifact
-    #source_clean_ecg=plt.figure()
-    #ax = plt.subplot(2,1,1)
     source_source_ecg=ica.plot_sources(ecg_evoked, exclude=ecg_source_idx)
     source_source_ecg.savefig(saveRoot + name + '_ecg_source.pdf', format = 'pdf')
     #ax = plt.subplot(2,1,2)
@@ -260,8 +216,6 @@ def runICA(raw,saveRoot,name):
                         size=plSize, res=pltRes,                            
                         axes=ax)
     ax = plt.subplot(2,3,6)
-#        eog_evoked.plot_topomap(0, ch_type='grad',size=plSize, res=pltRes, colorbar=False,
-#                              axes=ax)
     plot_evoked_topomap(eog_evoked, times=0, average=0.05, ch_type='grad',colorbar=False,
                 size=plSize, res=pltRes, show=False,                            
                 axes=ax)
@@ -273,31 +227,6 @@ def runICA(raw,saveRoot,name):
     icaList = ica.apply(raw)
     return(icaList, ica)
 
-    
-def getEvokedFields(epochsList,event_id,trigs):
-    ''' get evoked fields for each epoch object '''
-    evokedList = []
-    conds = event_id.keys()
-    for i in xrange(len(epochsList)):
-        for j in xrange(len(conds)):
-            evokedList.append(epochsList[i][conds[j]].average())
-    return evokedList
-    
-def adjustTriggerTimeLine(evokedList,adjustBy):
-    ''' adjust trigger time line for 'at' and 'ad' by the vowel duration '''
-    for i in xrange(len(evokedList)):
-        ## mne_doc: "When relative is True, positive value of tshift moves the data forward while negative tshift moves it backward." Hence, negative here to account for the initial vowel. 
-        evokedList[i].shift_time(tshift=adjustBy,relative=True)
-        
-    return evokedList
-    
-#def getEvokedContrast(evokedList):
-#    ''' calculate contrasts for each comparison '''
-#    contrastList = []
-#    for i in xrange(len(evokedList)/2):
-#        contrastList.append(evokedList[2*i+1] - evokedList[2*i])
-#    return contrastList
-    
 def saveRaw(raw,ica,saveRoot,name):
     raw.save(saveRoot + name + '_ica-raw.fif', overwrite=False)
     ica.save(saveRoot + name + '-ica.fif')
