@@ -6,7 +6,6 @@ Adapted on Aug 2015)
 @orig_author: lau
 @author: andreas & niels christian
 """
-
 '''ANALYSIS PIPELINE FUNCTIONS'''
 ' Many of these are NOT used!!! '
 
