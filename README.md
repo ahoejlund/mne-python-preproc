@@ -7,5 +7,3 @@ Filtering
 ICA-based rejection of ECG and EOG artifacts
   - involves plotting and saving figures for this process
   - as well as an interactive function for inspecting the rejected components
-  - save ICA solution
-  - save Cleaned RAW data
