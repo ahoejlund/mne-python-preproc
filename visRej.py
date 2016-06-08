@@ -4,6 +4,7 @@ Created on Tue Feb 16 13:15:38 2016
 @author: kousik
 Code to re-run files that weren't cleaned properly
 Can use visual feedback to reject components
+
 *** Caution ***
 Copy the raw and ica solutions of files into\
 a new folder. here for eg. artRej
