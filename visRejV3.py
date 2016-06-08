@@ -43,15 +43,11 @@ except:
     os.mkdir(resultsRoot)       
     print '*** Directory created now'                
                 
-
+# Get ICA file list and recreate filenames of RAW, 
 icaFileList = [f for f in os.listdir(artRejRoot) if f.endswith('-ica.fif')]
 icaFileList.sort()
-
-artRejFileList=[]
-
 for f in np.arange(0,np.size(icaFileList)): 
-    artRejFileList.insert(f,icaFileList[f][:-8]+'_ica-raw.fif')
-    #rawFileList.insert(f,icaFileList[f][:16]+'_tSSS.fif')
+    rawFileList.insert(f,icaFileList[f][:16]+'_tSSS.fif')
     
 for j in icaFileList:
     name=j[:-8]
