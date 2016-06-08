@@ -6,16 +6,19 @@ Created on Tue Feb 16 13:15:38 2016
 
 Code to re-run files that weren't cleaned properly
 Can use visual feedback to reject components
+*** Caution ***
+Copy the raw and ica solutions of files into\
+a new folder. here for eg. artRej
+
+# Needs: *-raw.fif and *-ica.fif files
+# Takes user input in TUI
 
 """
 
 import os
 import matplotlib
 matplotlib.use('TkAgg')
-print('TkAgg')
 import matplotlib.pyplot as plt
-
-
 import mne
 import numpy as np
 from mne.preprocessing import create_ecg_epochs, create_eog_epochs
