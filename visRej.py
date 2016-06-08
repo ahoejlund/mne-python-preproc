@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Feb 16 13:15:38 2016
-
 @author: kousik
-
 Code to re-run files that weren't cleaned properly
 Can use visual feedback to reject components
+
 *** Caution ***
 Copy the raw and ica solutions of files into\
 a new folder. here for eg. artRej
-
 # Run automatic ArtRej routine first
 # Needs: *-raw.fif and *-ica.fif files
 # Takes user input in TUI
-
-
 """
 
 import os
@@ -184,5 +180,3 @@ for j in icaFileList:
     raw_ica = icacomps.apply(raw)
     raw_ica.save(resultsRoot + name + '_ica-vis-raw.fif', overwrite=False,verbose=False)
     #ica.save(saveRoot + name + '-ica.fif')
-
-
