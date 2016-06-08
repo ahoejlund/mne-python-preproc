@@ -3,35 +3,42 @@
 Created on Tue Feb 16 13:15:38 2016
 
 @author: kousik
+
+Code to re-run files that weren't cleaned properly
+Can use visual feedback to reject components
+*** Caution ***
+Copy the raw and ica solutions of files into\
+a new folder. here for eg. artRej
+
+# Run automatic ArtRej routine first
+# Needs: *-raw.fif and *-ica.fif files
+# Takes user input in TUI
+
+
 """
 
 import os
 import matplotlib
 matplotlib.use('TkAgg')
-print('TkAgg')
 import matplotlib.pyplot as plt
-
-
 import mne
 import numpy as np
 from mne.preprocessing import create_ecg_epochs, create_eog_epochs
 
 ## which steps to run
 ## first steps
-read = 1 ## can't save filtered files, so don't run this time \
-                  ## consuming process every time
-Filter = 1
-## epochs and sensor space processing
+read = 1          # can't save filtered files, so don't run this time \
+                  # consuming process every time
+Filter = 1        # epochs and sensor space processing
 epochIca = 0
 evokeds = 0
 saveICA = 1
 ICAraw = 1
 
-
 ## set path and subs
 baseRoot='/projects/<yourProj>/<folder>' # your projects folder
 rawRoot     = baseRoot+'/tSSS/'          # Folder containing RAW files post-tSSS
-artRejRoot  = baseRoot+'/artRej/visRej/' # Folder containing artRej files from auto-Run
+artRejRoot  = baseRoot+'/artRej/'        # Folder containing ICA solution files(*-ica.fif) from auto-Run
 resultsRoot = baseRoot+'/artRej/'        # Folder to save PDFs, RAW-clean: \
                                          # Program appends file names with '-vis' tag\
                                          # No overwrite risk
@@ -47,7 +54,7 @@ except:
 icaFileList = [f for f in os.listdir(artRejRoot) if f.endswith('-ica.fif')]
 icaFileList.sort()
 for f in np.arange(0,np.size(icaFileList)): 
-    rawFileList.insert(f,icaFileList[f][:16]+'_tSSS.fif')
+    rawFileList.insert(f,icaFileList[f][:-8]+'_tSSS.fif')
     
 for j in icaFileList:
     name=j[:-8]
